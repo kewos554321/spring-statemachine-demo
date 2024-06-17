@@ -16,6 +16,9 @@ import org.springframework.statemachine.state.State;
 import com.demo.core.enumerate.Events;
 import com.demo.core.enumerate.States;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 @EnableStateMachine
 public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States, Events> {
@@ -54,7 +57,7 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
         return new StateMachineListenerAdapter<States, Events>() {
             @Override
             public void stateChanged(State<States, Events> from, State<States, Events> to) {
-                System.out.println("State change to " + to.getId());
+                log.info("State change to {}", to.getId());
             }
         };
     }
