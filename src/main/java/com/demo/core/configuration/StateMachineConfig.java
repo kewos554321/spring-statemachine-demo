@@ -16,6 +16,9 @@ import org.springframework.statemachine.state.State;
 import com.demo.core.enumerate.Events;
 import com.demo.core.enumerate.States;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 @EnableStateMachine
 public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States, Events> {
@@ -34,27 +37,35 @@ public class StateMachineConfig extends EnumStateMachineConfigurerAdapter<States
             throws Exception {
         states
             .withStates()
-                .initial(States.SI)
+                .initial(States.LOCKED)
                     .states(EnumSet.allOf(States.class));
     }
 
-    @Override
-    public void configure(StateMachineTransitionConfigurer<States, Events> transitions)
-            throws Exception {
-        transitions
-            .withExternal()
-                .source(States.SI).target(States.S1).event(Events.E1)
-                .and()
-            .withExternal()
-                .source(States.S1).target(States.S2).event(Events.E2);
-    }
+	@Override
+	public void configure(StateMachineTransitionConfigurer<States, Events> transitions)
+			throws Exception {
+		transitions
+				.withExternal()
+						.source(States.LOCKED)
+						.target(States.UNLOCKED)
+						.event(Events.COIN)
+						.and()
+				.withExternal()
+						.source(States.UNLOCKED)
+						.target(States.LOCKED)
+						.event(Events.PUSH);
+	}
 
     @Bean
     public StateMachineListener<States, Events> listener() {
         return new StateMachineListenerAdapter<States, Events>() {
             @Override
             public void stateChanged(State<States, Events> from, State<States, Events> to) {
-                System.out.println("State change to " + to.getId());
+				if (from != null) {
+					log.info("State change from {} to {}", from, to.getId());
+				} else {
+					log.info("State change to {}", to.getId());
+				}
             }
         };
     }

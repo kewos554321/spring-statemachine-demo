@@ -4,11 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
 
 import com.demo.core.enumerate.Events;
 import com.demo.core.enumerate.States;
 
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
+
+@Slf4j
 @SpringBootApplication
 public class SpringStatemachineDemoApplication implements CommandLineRunner {
 
@@ -21,8 +26,27 @@ public class SpringStatemachineDemoApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		stateMachine.sendEvent(Events.E1);
-    	stateMachine.sendEvent(Events.E2);
+		// stateMachine.sendEvent(Mono.just(MessageBuilder
+		// 		.withPayload(Events.COIN).build()));
+    	// stateMachine.sendEvent(Events.COIN);
+		stateMachine.startReactively().subscribe(); 
+		stateMachine
+			.sendEvent(Mono.just(MessageBuilder
+				.withPayload(Events.COIN).build()))
+			.subscribe();
+		stateMachine
+			.sendEvent(Mono.just(MessageBuilder
+				.withPayload(Events.PUSH).build()))
+			.subscribe();
+		stateMachine
+			.sendEvent(Mono.just(MessageBuilder
+				.withPayload(Events.COIN).build()))
+			.subscribe();
+		stateMachine
+			.sendEvent(Mono.just(MessageBuilder
+				.withPayload(Events.COIN).build()))
+			.subscribe();
+		log.info("stateMachine={}", stateMachine.getId());
 	}
 
 }
